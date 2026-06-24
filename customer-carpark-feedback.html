@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Car Park Security – Customer Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #e4e7ed;
+    --accent: #1a3557;
+    --accent-light: #e8f0fb;
+    --gold: #e8b84b;
+    --gold-light: #fdf6e3;
+    --danger: #e84b4b;
+    --text: #1a1f2e;
+    --muted: #7b8394;
+    --success: #1dab6e;
+    --success-light: #e6f7f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* ── Hero header ── */
+  .hero {
+    background: var(--accent);
+    padding: 32px 20px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(232,184,75,0.1);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-icon { font-size: 36px; margin-bottom: 10px; }
+  .hero h1 { font-size: 20px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 6px; }
+  .hero p { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; max-width: 320px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-block;
+    margin-top: 14px;
+    background: rgba(232,184,75,0.15);
+    border: 1px solid rgba(232,184,75,0.3);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap { background: #e0e4ee; height: 4px; }
+  .progress-fill { height: 100%; width: 0%; background: var(--gold); transition: width 0.4s ease; }
+
+  /* ── Container ── */
+  .container { max-width: 480px; margin: 0 auto; padding: 0 16px 80px; }
+
+  /* ── Step indicator ── */
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 0 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .step-indicator span { color: var(--accent); font-weight: 500; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .card-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-question { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; }
+  .card-body { padding: 14px 16px; }
+
+  /* ── Options ── */
+  .opt-grid { display: grid; gap: 8px; }
+  .opt-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .opt-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .opt-item { position: relative; }
+  .opt-item input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .opt-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.15s;
+    user-select: none;
+    line-height: 1.3;
+  }
+  .opt-item input:checked + .opt-label {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .opt-dot {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .opt-item input:checked + .opt-label .opt-dot {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(26,53,87,0.12);
+  }
+
+  /* Yes/No specific */
+  .opt-item.yes input:checked + .opt-label { border-color: var(--success); background: var(--success-light); color: var(--success); }
+  .opt-item.yes input:checked + .opt-label .opt-dot { border-color: var(--success); background: var(--success); box-shadow: 0 0 0 3px rgba(29,171,110,0.15); }
+  .opt-item.no  input:checked + .opt-label { border-color: var(--danger);  background: rgba(232,75,75,0.06);  color: var(--danger); }
+  .opt-item.no  input:checked + .opt-label .opt-dot { border-color: var(--danger);  background: var(--danger);  box-shadow: 0 0 0 3px rgba(232,75,75,0.15); }
+
+  /* Safety colours */
+  .opt-item.safe-vs input:checked + .opt-label { border-color: var(--success); background: var(--success-light); color: var(--success); }
+  .opt-item.safe-vs input:checked + .opt-label .opt-dot { border-color: var(--success); background: var(--success); }
+  .opt-item.safe-s  input:checked + .opt-label { border-color: #4a9e6e; background: rgba(74,158,110,0.08); color: #4a9e6e; }
+  .opt-item.safe-s  input:checked + .opt-label .opt-dot { border-color: #4a9e6e; background: #4a9e6e; }
+  .opt-item.safe-n  input:checked + .opt-label { border-color: var(--gold); background: var(--gold-light); color: #b8860b; }
+  .opt-item.safe-n  input:checked + .opt-label .opt-dot { border-color: var(--gold); background: var(--gold); }
+  .opt-item.safe-u  input:checked + .opt-label { border-color: var(--danger); background: rgba(232,75,75,0.06); color: var(--danger); }
+  .opt-item.safe-u  input:checked + .opt-label .opt-dot { border-color: var(--danger); background: var(--danger); }
+
+  /* Rating stars */
+  .star-row { display: flex; gap: 8px; justify-content: center; padding: 4px 0; }
+  .star-item { position: relative; flex: 1; }
+  .star-item input { position: absolute; opacity: 0; }
+  .star-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 6px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .star-icon { font-size: 20px; transition: transform 0.15s; }
+  .star-label-text { font-size: 9px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.05em; text-align: center; }
+  .star-item input:checked + .star-btn { border-color: var(--gold); background: var(--gold-light); }
+  .star-item input:checked + .star-btn .star-icon { transform: scale(1.2); }
+  .star-item input:checked + .star-btn .star-label-text { color: #b8860b; font-weight: 600; }
+
+  /* Textarea */
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,53,87,0.07); }
+  textarea::placeholder { color: var(--muted); }
+
+  /* Select */
+  select {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+  select:focus { border-color: var(--accent); }
+
+  /* Thank you / privacy note */
+  .privacy-note {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    border: 1px solid rgba(26,53,87,0.1);
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .privacy-note .pi { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Submit */
+  .submit-zone { margin-top: 20px; }
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .submit-btn:hover { background: #22446e; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,53,87,0.2); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Success screen */
+  .success-screen { display: none; text-align: center; padding: 60px 20px 40px; }
+  .success-screen.visible { display: block; }
+  .success-big { font-size: 64px; margin-bottom: 16px; }
+  .success-screen h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 300px; margin: 0 auto; }
+  .success-stars { font-size: 22px; letter-spacing: 4px; margin: 14px 0; }
+  .reset-btn { margin-top: 24px; padding: 10px 28px; background: var(--accent-light); color: var(--accent); border: 1.5px solid rgba(26,53,87,0.15); border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; }
+
+  /* Store intro card */
+  .store-card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .store-card-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+
+  .form-content {}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-icon">🚗</div>
+  <h1>Car Park Security<br>Feedback</h1>
+  <p>Help us improve your experience. This takes less than 2 minutes.</p>
+  <div class="hero-badge">🔒 Fully Anonymous</div>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="container">
+
+  <!-- Success screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-big">🎉</div>
+    <h2>Thank You!</h2>
+    <div class="success-stars">⭐⭐⭐⭐⭐</div>
+    <p>Your feedback has been submitted and will help us improve the security experience at our stores.</p>
+    <br>
+    <button class="reset-btn" onclick="resetForm()">Submit Another Response</button>
+  </div>
+
+  <div class="form-content" id="formContent">
+
+    <div class="step-indicator">Question <span id="stepCurrent">1</span> of <span>10</span></div>
+
+    <!-- Store selection -->
+    <div class="store-card">
+      <div class="store-card-label">Which store did you visit?</div>
+      <select id="storeSelect">
+        <option value="" disabled selected>Select a store...</option>
+        <option>Arulogun</option>
+        <option>Gbagi</option>
+        <option>Moniya</option>
+        <option>Oluyole</option>
+        <option>Tollgate</option>
+      </select>
+    </div>
+
+    <!-- Q1 -->
+    <div class="card" id="card-q1">
+      <div class="card-header">
+        <div class="card-num">1</div>
+        <div class="card-question">Was the security personnel courteous and respectful?</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-2">
+          <div class="opt-item yes"><input type="radio" name="q1" id="q1y" value="Yes"><label class="opt-label" for="q1y"><span class="opt-dot"></span>Yes</label></div>
+          <div class="opt-item no"><input type="radio" name="q1" id="q1n" value="No"><label class="opt-label" for="q1n"><span class="opt-dot"></span>No</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="card" id="card-q2">
+      <div class="card-header">
+        <div class="card-num">2</div>
+        <div class="card-question">Did the security personnel greet or acknowledge you?</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-2">
+          <div class="opt-item yes"><input type="radio" name="q2" id="q2y" value="Yes"><label class="opt-label" for="q2y"><span class="opt-dot"></span>Yes</label></div>
+          <div class="opt-item no"><input type="radio" name="q2" id="q2n" value="No"><label class="opt-label" for="q2n"><span class="opt-dot"></span>No</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="card" id="card-q3">
+      <div class="card-header">
+        <div class="card-num">3</div>
+        <div class="card-question">Did you feel safe in the car park?</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-2">
+          <div class="opt-item safe-vs"><input type="radio" name="q3" id="q3a" value="Very Safe"><label class="opt-label" for="q3a"><span class="opt-dot"></span>Very Safe</label></div>
+          <div class="opt-item safe-s"><input type="radio" name="q3" id="q3b" value="Safe"><label class="opt-label" for="q3b"><span class="opt-dot"></span>Safe</label></div>
+          <div class="opt-item safe-n"><input type="radio" name="q3" id="q3c" value="Neutral"><label class="opt-label" for="q3c"><span class="opt-dot"></span>Neutral</label></div>
+          <div class="opt-item safe-u"><input type="radio" name="q3" id="q3d" value="Unsafe"><label class="opt-label" for="q3d"><span class="opt-dot"></span>Unsafe</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="card" id="card-q4">
+      <div class="card-header">
+        <div class="card-num">4</div>
+        <div class="card-question">Was the security personnel attentive and visible?</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-2">
+          <div class="opt-item yes"><input type="radio" name="q4" id="q4y" value="Yes"><label class="opt-label" for="q4y"><span class="opt-dot"></span>Yes</label></div>
+          <div class="opt-item no"><input type="radio" name="q4" id="q4n" value="No"><label class="opt-label" for="q4n"><span class="opt-dot"></span>No</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="card" id="card-q5">
+      <div class="card-header">
+        <div class="card-num">5</div>
+        <div class="card-question">Did the security personnel assist with parking or traffic flow when needed?</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-2">
+          <div class="opt-item yes"><input type="radio" name="q5" id="q5y" value="Yes"><label class="opt-label" for="q5y"><span class="opt-dot"></span>Yes</label></div>
+          <div class="opt-item no"><input type="radio" name="q5" id="q5n" value="No"><label class="opt-label" for="q5n"><span class="opt-dot"></span>No</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="card" id="card-q6">
+      <div class="card-header">
+        <div class="card-num">6</div>
+        <div class="card-question">Was the security personnel professional in appearance and conduct?</div>
+      </div>
+      <div class="card-body">
+        <div class="star-row">
+          <div class="star-item"><input type="radio" name="q6" id="q6a" value="Poor"><label class="star-btn" for="q6a"><span class="star-icon">😞</span><span class="star-label-text">Poor</span></label></div>
+          <div class="star-item"><input type="radio" name="q6" id="q6b" value="Fair"><label class="star-btn" for="q6b"><span class="star-icon">😐</span><span class="star-label-text">Fair</span></label></div>
+          <div class="star-item"><input type="radio" name="q6" id="q6c" value="Good"><label class="star-btn" for="q6c"><span class="star-icon">😊</span><span class="star-label-text">Good</span></label></div>
+          <div class="star-item"><input type="radio" name="q6" id="q6d" value="Excellent"><label class="star-btn" for="q6d"><span class="star-icon">🤩</span><span class="star-label-text">Excellent</span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="card" id="card-q7">
+      <div class="card-header">
+        <div class="card-num">7</div>
+        <div class="card-question">How would you rate the overall service provided by the security personnel?</div>
+      </div>
+      <div class="card-body">
+        <div class="star-row">
+          <div class="star-item"><input type="radio" name="q7" id="q7a" value="Poor"><label class="star-btn" for="q7a"><span class="star-icon">⭐</span><span class="star-label-text">Poor</span></label></div>
+          <div class="star-item"><input type="radio" name="q7" id="q7b" value="Fair"><label class="star-btn" for="q7b"><span class="star-icon">⭐⭐</span><span class="star-label-text">Fair</span></label></div>
+          <div class="star-item"><input type="radio" name="q7" id="q7c" value="Good"><label class="star-btn" for="q7c"><span class="star-icon">⭐⭐⭐</span><span class="star-label-text">Good</span></label></div>
+          <div class="star-item"><input type="radio" name="q7" id="q7d" value="Excellent"><label class="star-btn" for="q7d"><span class="star-icon">⭐⭐⭐⭐</span><span class="star-label-text">Excellent</span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q8 — Security Company -->
+    <div class="card" id="card-q8">
+      <div class="card-header">
+        <div class="card-num">8</div>
+        <div class="card-question">Which security company was on duty? (If you noticed)</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-2">
+          <div class="opt-item"><input type="radio" name="q8" id="q8a" value="Halogen"><label class="opt-label" for="q8a"><span class="opt-dot"></span>Halogen</label></div>
+          <div class="opt-item"><input type="radio" name="q8" id="q8b" value="Proton"><label class="opt-label" for="q8b"><span class="opt-dot"></span>Proton</label></div>
+          <div class="opt-item"><input type="radio" name="q8" id="q8c" value="Apple"><label class="opt-label" for="q8c"><span class="opt-dot"></span>Apple</label></div>
+          <div class="opt-item"><input type="radio" name="q8" id="q8d" value="Vaak"><label class="opt-label" for="q8d"><span class="opt-dot"></span>Vaak</label></div>
+          <div class="opt-item"><input type="radio" name="q8" id="q8e" value="Wordlens"><label class="opt-label" for="q8e"><span class="opt-dot"></span>Wordlens</label></div>
+          <div class="opt-item"><input type="radio" name="q8" id="q8f" value="Sheriff"><label class="opt-label" for="q8f"><span class="opt-dot"></span>Sheriff</label></div>
+          <div class="opt-item"><input type="radio" name="q8" id="q8g" value="Not sure"><label class="opt-label" for="q8g"><span class="opt-dot"></span>Not sure</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q9 — Visit time -->
+    <div class="card" id="card-q9">
+      <div class="card-header">
+        <div class="card-num">9</div>
+        <div class="card-question">What time of day was your visit?</div>
+      </div>
+      <div class="card-body">
+        <div class="opt-grid cols-3">
+          <div class="opt-item"><input type="radio" name="q9" id="q9a" value="Morning"><label class="opt-label" for="q9a"><span class="opt-dot"></span>Morning</label></div>
+          <div class="opt-item"><input type="radio" name="q9" id="q9b" value="Afternoon"><label class="opt-label" for="q9b"><span class="opt-dot"></span>Afternoon</label></div>
+          <div class="opt-item"><input type="radio" name="q9" id="q9c" value="Evening"><label class="opt-label" for="q9c"><span class="opt-dot"></span>Evening</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q10 — Comments -->
+    <div class="card" id="card-q10">
+      <div class="card-header">
+        <div class="card-num">10</div>
+        <div class="card-question">Any comments or suggestions about the car park security team?</div>
+      </div>
+      <div class="card-body">
+        <textarea id="comments" placeholder="Share your thoughts here (optional)..."></textarea>
+      </div>
+    </div>
+
+    <!-- Privacy note -->
+    <div class="privacy-note">
+      <span class="pi">🔒</span>
+      <span>This form is fully anonymous. We do not collect your name, phone number, or any personal information. Your honest feedback helps us serve you better.</span>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-zone">
+      <button class="submit-btn" id="submitBtn" onclick="submitForm()">Submit Feedback →</button>
+    </div>
+
+  </div><!-- /formContent -->
+</div><!-- /container -->
+
+<script>
+  const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+  // ── Progress tracking ─────────────────────────────────────
+  function updateProgress() {
+    const names = ['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+    let answered = 0;
+    names.forEach(n => { if (document.querySelector(`input[name="${n}"]:checked`)) answered++; });
+    const pct = Math.round((answered / names.length) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('stepCurrent').textContent = Math.min(answered + 1, 10);
+  }
+
+  document.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.addEventListener('change', updateProgress);
+  });
+
+  // ── Submit ────────────────────────────────────────────────
+  function getR(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+  }
+
+  async function submitForm() {
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+
+    const now = new Date();
+    const payload = {
+      form_type:    'customer_carpark',
+      ref:          'CX-' + Date.now().toString(36).toUpperCase().slice(-6),
+      timestamp:    now.toISOString(),
+      date:         now.toLocaleDateString('en-GB'),
+      time:         now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }),
+      store:        document.getElementById('storeSelect')?.value || '',
+      courteous:    getR('q1'),
+      greeted:      getR('q2'),
+      felt_safe:    getR('q3'),
+      attentive:    getR('q4'),
+      assisted:     getR('q5'),
+      appearance:   getR('q6'),
+      overall:      getR('q7'),
+      security_co:  getR('q8'),
+      visit_time:   getR('q9'),
+      comments:     document.getElementById('comments')?.value.trim() || '',
+    };
+
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      document.getElementById('formContent').style.display = 'none';
+      document.getElementById('successScreen').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      btn.textContent = 'Submit Feedback →';
+      btn.disabled = false;
+      alert('Submission failed. Please check your connection and try again.');
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('successScreen').classList.remove('visible');
+    document.getElementById('formContent').style.display = 'block';
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.getElementById('comments').value = '';
+    document.getElementById('storeSelect').value = '';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('stepCurrent').textContent = '1';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
